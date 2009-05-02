@@ -28,11 +28,14 @@ function snapshot_normalize($path) {
 }
 
 function snapshot_snapshot() {
+	$chrono = time();
 	$url = (object)parse_url($GLOBALS['db_url']);
 	$dbname = substr($url->path, 1);
 	$db = snapshot_normalize(variable_get('snapshot_mysql_var', '/var/lib/mysql/')) . '/' . $dbname;
 	$snapshot = snapshot_normalize(variable_get('snapshot_folder', '/tmp/snapshot/')) . '/' . $dbname;
-	$c = new Cp($db, $snapshot);
+	
+	$copyator = array(snapshot_Cp, snapshot_Rsync, snapshot_Rdiff);
+	$c = new $copyator[variable_get('snapshot_copy', 1)]($db, $snapshot);
 	$c->pre();
 	db_query('FLUSH TABLES WITH READ LOCK');
 	$c->log('lock');
@@ -40,9 +43,10 @@ function snapshot_snapshot() {
 	db_query('UNLOCK TABLES');
 	$c->log('unlock');
 	$c->post();
+	$c->log('Chrono: ' . (time() - $chrono) . 's' );
 }
 
-Class Copy {
+Class snapshot_Copy {
 	protected $from, $to;
 	public function __construct($f, $t) {
 		$this->from = $f;
@@ -56,7 +60,7 @@ Class Copy {
 	}
 }
 
-class Cp extends Copy {
+class snapshot_Cp extends snapshot_Copy {
 	public function pre() {
 		rmdir($this->to);
 		mkdir($this->to, 0744, true);
@@ -68,10 +72,31 @@ class Cp extends Copy {
 		echo $this->from;
 		while(false !== ($file = readdir($handle))) {
 			if($file != "." && $file != ".."){
-				copy("$this->from/$file", "$this->to/$file");
+				copy("$this->from/$file", "$this->to/db/$file");
 				$this->log("backup: $file");
 			}
 		}
 		closedir($handle);
 	}
 }
+
+class snapshot_Rsync extends snapshot_Copy {
+	public function pre() {
+		system('mkdir -p '. escapeshellarg($this->to) . '/db');
+		system('mkdir -p '. escapeshellarg($this->to) . '/www');
+		$this->log("$this->to is ready");
+	}
+	private function _rsync($from, $to) {
+		passthru('rsync -av --delete-after ' . escapeshellarg($from) . ' ' . escapeshellarg($to));
+		
+	}
+	public function copy() {
+		$this->_rsync($this->from, $this->to . '/db/');
+		$this->log('db');
+		$this->_rsync(system('pwd'), $this->to . '/www/');
+		$this->log('www');
+	}
+}
+
+//[TODO]
+class snapshot_Ridff extends snapshot_Copy {}
