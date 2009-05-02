@@ -62,6 +62,7 @@ class Cp extends Copy {
 	}
 	public function copy() {
 		$handle = opendir($this->from);
+		echo $this->from;
 		while(false !== ($file = readdir($handle))) {
 			if($file != "." && $file != ".."){
 				echo "[Snapshot] copying $file\n";
