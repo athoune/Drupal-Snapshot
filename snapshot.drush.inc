@@ -35,38 +35,41 @@ function snapshot_snapshot() {
 	$c = new Cp($db, $snapshot);
 	$c->pre();
 	db_query('FLUSH TABLES WITH READ LOCK');
-	echo "[Snapshot] lock\n";
-	var_dump($c);
+	$c->log('lock');
 	$c->copy();
 	db_query('UNLOCK TABLES');
-	echo "[Snapshot] unlock\n";
+	$c->log('unlock');
 	$c->post();
 }
 
 Class Copy {
-	private $from;
-	private $to;
-	public function __construct($from, $to) {
-		$this->from = $from;
-		$this->to = $to;
+	protected $from, $to;
+	public function __construct($f, $t) {
+		$this->from = $f;
+		$this->to = $t;
 	}
 	public function pre() {}
 	public function copy() {}
 	public function post() {}
+	public function log($msg) {
+		echo "[Snapshot] $msg\n";
+	}
 }
 
 class Cp extends Copy {
 	public function pre() {
 		rmdir($this->to);
 		mkdir($this->to, 0744, true);
+		$this->log("$this->to is ready");
 	}
 	public function copy() {
+		echo "beuha\n";
 		$handle = opendir($this->from);
 		echo $this->from;
 		while(false !== ($file = readdir($handle))) {
 			if($file != "." && $file != ".."){
-				echo "[Snapshot] copying $file\n";
 				copy("$this->from/$file", "$this->to/$file");
+				$this->log("backup: $file");
 			}
 		}
 		closedir($handle);
