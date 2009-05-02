@@ -1,0 +1,5 @@
+name = Drush snapshot
+description = Make a database snapshot
+package = Drush
+dependencies[] =
+core = 6.x

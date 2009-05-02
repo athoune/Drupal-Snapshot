@@ -1,0 +1,36 @@
+<?php
+
+function snapshot_menu(){
+	$items['admin/settings/snapshot'] = array(
+		'description' => 'MyIsam Snapshot made easy',
+		'title' => 'MyIsam Snapshot',
+		'page callback' => 'drupal_get_form',
+		'page arguments' => array('snapshot_admin_settings'),
+		'access arguments' => array('administer site configuration'),
+		'type' => MENU_NORMAL_ITEM,
+	);
+	return $items;
+}
+
+function snapshot_admin_settings() {
+	$form['snapshot_mysql_var'] = array(
+		'#type' => 'textfield',
+		'#title' => 'path',
+		'#default_value' => variable_get('snapshot_mysql_var', '/var/lib/mysql/'),
+		'#description' => t('Where Mysql stores its MyIsam files?'),
+	);
+	$form['snapshot_folder'] = array(
+		'#type' => 'textfield',
+		'#title' => 'path',
+		'#default_value' => variable_get('snapshot_folder', '/tmp/snapshot/'),
+		'#description' => t('Where to snapshot'),
+	);
+	$form['snapshot_copy'] = array(
+		'#type' =>'radios',
+		'#title' => t('Copying method'),
+		'#description' => t('Wich method will be used to take the snapshot'),
+		'#options' => array('cp', 'rsync', 'rdiff'),
+		'#default_value' => variable_get('snapshot_copy', 0)
+	);
+	return system_settings_form($form);
+}
