@@ -99,6 +99,6 @@ class snapshot_Rsync extends snapshot_Copy {
 
 class snapshot_Rdiff extends snapshot_Rsync {
 	protected function bkp($from, $to) {
-		passthru('rdiff-backup -v5 ' . escapeshellarg($from) . ' ' . escapeshellarg($to));
+		passthru('rdiff-backup -v5 --remove-older-than 2W ' . escapeshellarg($from) . ' ' . escapeshellarg($to));
 	}
 }
