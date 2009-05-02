@@ -1,3 +1,8 @@
 Make a drupal snapshot with drush. Works only with Mysql and MyIsam.
 
 Different methods can be used, like cp, rsync or rdiff.
+
+[TODO]
+Don't backup temporary tables.
+Don't backup temporary files.
+Options for differents backup type.

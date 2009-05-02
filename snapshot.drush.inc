@@ -86,17 +86,19 @@ class snapshot_Rsync extends snapshot_Copy {
 		system('mkdir -p '. escapeshellarg($this->to) . '/www');
 		$this->log("$this->to is ready");
 	}
-	private function _rsync($from, $to) {
+	protected function bkp($from, $to) {
 		passthru('rsync -av --delete-after ' . escapeshellarg($from) . ' ' . escapeshellarg($to));
-		
 	}
 	public function copy() {
-		$this->_rsync($this->from, $this->to . '/db/');
+		$this->bkp($this->from, $this->to . '/db/');
 		$this->log('db');
-		$this->_rsync(system('pwd'), $this->to . '/www/');
+		$this->bkp(system('pwd'), $this->to . '/www/');
 		$this->log('www');
 	}
 }
 
-//[TODO]
-class snapshot_Ridff extends snapshot_Copy {}
+class snapshot_Rdiff extends snapshot_Rsync {
+	protected function bkp($from, $to) {
+		passthru('rdiff-backup -v5 ' . escapeshellarg($from) . ' ' . escapeshellarg($to));
+	}
+}
