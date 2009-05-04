@@ -1,5 +1,6 @@
 <?php
 // $Id$
+include_once 'snapshot.inc';
 
 function snapshot_menu() {
   $items['admin/settings/snapshot'] = array(
@@ -16,20 +17,20 @@ function snapshot_menu() {
 function snapshot_admin_settings() {
   $form['snapshot_mysql_var'] = array(
     '#type' => 'textfield',
-    '#title' => 'path',
+    '#title' => 'Mysql path',
     '#default_value' => variable_get('snapshot_mysql_var', '/var/lib/mysql/'),
     '#description' => t('Where Mysql stores its MyIsam files?'),
   );
   $form['snapshot_folder'] = array(
     '#type' => 'textfield',
-    '#title' => 'path',
-    '#default_value' => variable_get('snapshot_folder', '/tmp/snapshot/'),
+    '#title' => 'Snapshot path',
+    '#default_value' => variable_get('snapshot_folder', '/tmp/snapshot/'. snapshot_default_db()),
     '#description' => t('Where to snapshot'),
   );
   $form['snapshot_copy'] = array(
     '#type' => 'radios',
     '#title' => t('Copying method'),
-    '#description' => t('Which method will be used to take the snapshot'),
+    '#description' => t('Which method will be used to take the snapshot. <ul><li><b>cp</b> is simple but slow</li><li><b>rsync</b> only copy the difference between the old snapshot and the current one</li><li><b>rdiff-backup</b> stores the delta of each snapshot for 2 weeks</li></ul>'),
     '#options' => array('cp', 'rsync', 'rdiff-backup'),
     '#default_value' => variable_get('snapshot_copy', 1)
   );

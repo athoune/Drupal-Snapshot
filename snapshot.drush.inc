@@ -1,5 +1,6 @@
 <?php
 // $Id$
+include_once 'snapshot.inc';
 
 /**
  * Implementation of hook_help().
@@ -34,10 +35,9 @@ function snapshot_normalize($path) {
 
 function snapshot_snapshot() {
   $chrono = time();
-  $url = (object)parse_url($GLOBALS['db_url']);
-  $dbname = substr($url->path, 1);
+  $dbname = snapshot_default_db();
   $db = snapshot_normalize(variable_get('snapshot_mysql_var', '/var/lib/mysql/')) .'/'. $dbname;
-  $snapshot = snapshot_normalize(variable_get('snapshot_folder', '/tmp/snapshot/')) .'/'. $dbname;
+  $snapshot = snapshot_normalize(variable_get('snapshot_folder', '/tmp/snapshot/'. snapshot_default_db())) .'/'. $dbname;
   $copyator = array(snapshot_Cp, snapshot_Rsync, snapshot_Rdiff);
   $snapshot_copy = variable_get('snapshot_copy', 1);
   $c = new $copyator[$snapshot_copy]($db, $snapshot);
