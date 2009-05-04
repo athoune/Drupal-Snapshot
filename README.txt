@@ -2,6 +2,15 @@ Make a drupal snapshot with drush. Works only with Mysql and MyIsam.
 
 Different methods can be used, like cp, rsync or rdiff-backup.
 
+INSTALL
+
+$ cd sites/all/modules
+$ git clone git://github.com/athoune/Drupal-Snapshot.git snapshot
+
+USAGE
+
+$ drush snapshot
+
 [TODO]
 Don't backup temporary tables.
 Don't backup temporary files.
@@ -9,3 +18,4 @@ Options for differents backup type.
 Handling fs snapshot like XFS, lvm or ZFS.
 Handling rsnapshot.
 Handling distant backup.
+Mysql Innodb and Postgres

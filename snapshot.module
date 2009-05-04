@@ -1,6 +1,7 @@
 <?php
+// $Id$
 
-function snapshot_menu(){
+function snapshot_menu() {
 	$items['admin/settings/snapshot'] = array(
 		'description' => 'MyIsam Snapshot made easy',
 		'title' => 'MyIsam Snapshot',

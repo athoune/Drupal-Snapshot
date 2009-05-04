@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 /**
  * Implementation of hook_help().
@@ -22,8 +23,9 @@ function snapshot_drush_command() {
 }
 
 function snapshot_normalize($path) {
-	if(substr($path,-1) == '/')
-		return substr($path,0,-1);
+	if (substr($path, -1) == '/') {
+		return substr($path, 0, -1);
+	}
 	return $path;
 }
 
@@ -35,7 +37,8 @@ function snapshot_snapshot() {
 	$snapshot = snapshot_normalize(variable_get('snapshot_folder', '/tmp/snapshot/')) . '/' . $dbname;
 	
 	$copyator = array(snapshot_Cp, snapshot_Rsync, snapshot_Rdiff);
-	$c = new $copyator[variable_get('snapshot_copy', 1)]($db, $snapshot);
+	$snapshot_copy = variable_get('snapshot_copy', 1);
+	$c = new $copyator[$snapshot_copy]($db, $snapshot);
 	$c->pre();
 	db_query('FLUSH TABLES WITH READ LOCK');
 	$c->log('lock');
@@ -43,7 +46,7 @@ function snapshot_snapshot() {
 	db_query('UNLOCK TABLES');
 	$c->log('unlock');
 	$c->post();
-	$c->log('Chrono: ' . (time() - $chrono) . 's' );
+	$c->log('Chrono: ' . (time() - $chrono) . 's');
 }
 
 Class snapshot_Copy {
@@ -70,8 +73,8 @@ class snapshot_Cp extends snapshot_Copy {
 		echo "beuha\n";
 		$handle = opendir($this->from);
 		echo $this->from;
-		while(false !== ($file = readdir($handle))) {
-			if($file != "." && $file != ".."){
+		while (false !== ($file = readdir($handle))) {
+			if ($file != "." && $file != "..") {
 				copy("$this->from/$file", "$this->to/db/$file");
 				$this->log("backup: $file");
 			}
