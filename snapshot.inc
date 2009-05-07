@@ -1,5 +1,5 @@
 <?php
-// $Id$
+// $Id: snapshot.inc,v 1.1 2009/05/07 10:07:10 athoune Exp $
 
 /**
  * The name of the current db
